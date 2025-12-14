@@ -41,10 +41,17 @@ jobs:
     - name: Install dependencies
       run: |
         brew update
-        brew install ninja mpv qt@6 || true
+        brew install ninja mpv qt@6
 
     - name: Configure
-      run: cmake -B build -G Ninja -DQTROOT=/opt/homebrew/opt/qt@6 -DCMAKE_BUILD_TYPE=Debug -DUSE_STATIC_MPVQT=ON
+      run: |
+        # Detect Qt installation path (ARM64 uses /opt/homebrew, Intel uses /usr/local)
+        if [ -d "/opt/homebrew/opt/qt@6" ]; then
+          QTROOT=/opt/homebrew/opt/qt@6
+        else
+          QTROOT=/usr/local/opt/qt@6
+        fi
+        cmake -B build -G Ninja -DQTROOT=$QTROOT -DCMAKE_BUILD_TYPE=Debug -DUSE_STATIC_MPVQT=ON
 
     - name: Build
       run: cmake --build build
