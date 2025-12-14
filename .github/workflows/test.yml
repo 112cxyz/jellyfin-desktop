@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
     - uses: actions/checkout@v4
       with:
@@ -33,6 +35,8 @@ jobs:
 
   test-macos:
     runs-on: macos-latest
+    permissions:
+      contents: read
     steps:
     - uses: actions/checkout@v4
       with:
