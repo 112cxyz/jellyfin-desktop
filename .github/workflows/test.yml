@@ -30,3 +30,26 @@ jobs:
       run: |
         cd build
         ctest --output-on-failure
+
+  test-macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        brew update
+        brew install ninja mpv qt@6 || true
+
+    - name: Configure
+      run: cmake -B build -G Ninja -DQTROOT=/opt/homebrew/opt/qt@6 -DCMAKE_BUILD_TYPE=Debug -DUSE_STATIC_MPVQT=ON
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure
