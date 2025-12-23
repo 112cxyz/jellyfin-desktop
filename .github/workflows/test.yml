@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
     - uses: actions/checkout@v4
       with:
@@ -22,6 +24,38 @@ jobs:
 
     - name: Configure
       run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DUSE_STATIC_MPVQT=ON
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure
+
+  test-macos:
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        brew update
+        brew install ninja mpv qt@6
+
+    - name: Configure
+      run: |
+        # Detect Qt installation path (ARM64 uses /opt/homebrew, Intel uses /usr/local)
+        if [ -d "/opt/homebrew/opt/qt@6" ]; then
+          QTROOT=/opt/homebrew/opt/qt@6
+        else
+          QTROOT=/usr/local/opt/qt@6
+        fi
+        cmake -B build -G Ninja -DQTROOT=$QTROOT -DCMAKE_BUILD_TYPE=Debug -DUSE_STATIC_MPVQT=ON
 
     - name: Build
       run: cmake --build build
